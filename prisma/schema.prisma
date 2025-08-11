@@ -7,8 +7,8 @@
 // ==============================================================================
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
 }
 
 // ==============================================================================
@@ -16,9 +16,9 @@ datasource db {
 // ==============================================================================
 
 generator client {
-  provider = "prisma-client-js"
-  // Generate Prisma Client to node_modules for better NestJS integration
-  output   = "../node_modules/.prisma/client"
+    provider = "prisma-client-js"
+    // Generate Prisma Client to node_modules for better NestJS integration
+    output   = "../node_modules/.prisma/client"
 }
 
 // Optional: Generate database documentation
@@ -33,21 +33,27 @@ generator client {
 
 /// User role enum - defines access levels in the application
 enum Role {
-  ADMIN     @map("admin")
-  USER      @map("user")
-  MODERATOR @map("moderator")
+    ADMIN @map("admin")
+    USER  @map("user")
 
-  @@map("roles")
+    @@map("roles")
 }
 
 /// Account status enum
 enum AccountStatus {
-  ACTIVE    @map("active")
-  INACTIVE  @map("inactive")
-  SUSPENDED @map("suspended")
-  PENDING   @map("pending")
+    ACTIVE    @map("active")
+    INACTIVE  @map("inactive")
+    SUSPENDED @map("suspended")
+    PENDING   @map("pending")
 
-  @@map("account_statuses")
+    @@map("account_statuses")
+}
+
+enum DefaultStatus {
+    ACTIVE   @map("active")
+    INACTIVE @map("inactive")
+
+    @@map("default_statuses")
 }
 
 // ==============================================================================
@@ -56,38 +62,72 @@ enum AccountStatus {
 
 /// User model - represents application users
 model User {
-  // Primary key
-  id Int @id @default(autoincrement()) @map("user_id")
+    // Primary key
+    id Int @id @default(autoincrement()) @map("user_id")
 
-  // Authentication fields
-  email    String  @unique @db.VarChar(255)
-  password String? @db.VarChar(255) // Optional for OAuth users
+    // Authentication fields
+    email    String  @unique @db.VarChar(255)
+    password String? @db.VarChar(255) // Optional for OAuth users
 
-  // Profile information
-  firstName String? @map("first_name") @db.VarChar(100)
-  lastName  String? @map("last_name") @db.VarChar(100)
-  fullName  String? @map("full_name") @db.VarChar(200) // Computed field or concatenated
-  avatar    String? @db.Text // URL to profile picture
-  bio       String? @db.Text
+    // Profile information
+    firstName String? @map("first_name") @db.VarChar(100)
+    lastName  String? @map("last_name") @db.VarChar(100)
+    fullName  String? @map("full_name") @db.VarChar(200) // Computed field or concatenated
+    avatar    String? @db.Text // URL to profile picture
+    bio       String? @db.Text
 
-  // System fields
-  role          Role          @default(USER)
-  status        AccountStatus @default(PENDING)
-  emailVerified Boolean       @default(false) @map("email_verified")
-  
-  // Timestamps (following NestJS conventions)
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(0)
-  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamp(0)
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp(0) // Soft delete support
+    // System fields
+    role          Role          @default(USER)
+    status        AccountStatus @default(PENDING)
+    emailVerified Boolean       @default(false) @map("email_verified")
 
-  // Indexes for better query performance
-  @@index([email])
-  @@index([status])
-  @@index([role])
-  @@index([createdAt])
-  
-  // Table mapping
-  @@map("users")
+    // Timestamps (following NestJS conventions)
+    createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(0)
+    updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamp(0)
+    deletedAt DateTime? @map("deleted_at") @db.Timestamp(0) // Soft delete support
+
+    // Indexes for better query performance
+    @@index([email])
+    @@index([status])
+    @@index([role])
+    @@index([createdAt])
+    // Table mapping
+    @@map("users")
+}
+
+// ==============================================================================
+// MODELS
+// ==============================================================================
+
+/// User model - represents application users
+enum PaymentStatus {
+    PENDING   @map("pending")
+    COMPLETED @map("completed")
+    FAILED    @map("failed")
+
+    @@map("payment_statuses")
+}
+
+model Payment {
+    id        Int           @id @default(autoincrement())
+    userEmail String        @map("user_email") @db.VarChar(255)
+    userPhone String        @map("user_phone") @db.VarChar(15)
+    userName  String        @map("user_name") @db.VarChar(255)
+    amount    Decimal       @db.Decimal(16, 2)
+    status    PaymentStatus @default(PENDING)
+    createdAt DateTime      @default(now()) @map("created_at") @db.Timestamp(0)
+    updatedAt DateTime      @updatedAt @map("updated_at") @db.Timestamp(0)
+
+    @@map("payments")
+}
+
+model Bank {
+    id     Int           @id @default(autoincrement())
+    name   String        @map("name") @db.VarChar(255)
+    code   String        @map("code") @db.VarChar(255)
+    status DefaultStatus @default(INACTIVE) @map("status")
+
+    @@map("banks")
 }
 
 // ==============================================================================
