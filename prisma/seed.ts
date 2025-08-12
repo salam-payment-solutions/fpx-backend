@@ -1,4 +1,5 @@
-import { DefaultStatus, PrismaClient, Role } from '@prisma/client'
+import { $Enums, PrismaClient, Role } from '@prisma/client'
+import fs from 'fs'
 
 const prisma = new PrismaClient()
 
@@ -25,35 +26,200 @@ async function main() {
     },
   })
 
-  // create banks
+  // create B2C banks
   const banks = await prisma.bank.createMany({
     data: [
-      { "id": 1, "code": "ABB0234", "name": "Affin B2C - Test ID" },
-      { "id": 2, "code": "ABB0233", "name": "Affin Bank" },
-      { "id": 3, "code": "ABMB0212", "name": "Alliance Bank (Personal)" },
-      { "id": 4, "code": "AGRO01", "name": "AGRONet" },
-      { "id": 5, "code": "AMBB0209", "name": "AmBank" },
-      { "id": 6, "code": "BIMB0340", "name": "Bank Islam" },
-      { "id": 7, "code": "BMMB0341", "name": "Bank Muamalat" },
-      { "id": 8, "code": "BKRM0602", "name": "Bank Rakyat" },
-      { "id": 9, "code": "BOCM01", "name": "Bank Of China" },
-      { "id": 10, "code": "BSN0601", "name": "BSN" },
-      { "id": 11, "code": "BCBB0235", "name": "CIMB Clicks" },
-      { "id": 12, "code": "CITO219", "name": "Citibank" },
-      { "id": 13, "code": "HLB0224", "name": "Hong Leong Bank" },
-      { "id": 14, "code": "HSBC0223", "name": "HSBC Bank" },
-      { "id": 15, "code": "KFH0346", "name": "KFH" },
-      { "id": 16, "code": "MBB0228", "name": "Maybank2E" },
-      { "id": 17, "code": "MB2U0227", "name": "Maybank2U" },
-      { "id": 18, "code": "OCBС0229", "name": "OCBC Bank" },
-      { "id": 19, "code": "PBB0233", "name": "Public Bank" },
-      { "id": 20, "code": "RHB0218", "name": "RHB Bank" },
-      { "id": 21, "code": "TESTO021", "name": "SBI Bank A" },
-      { "id": 22, "code": "TESTO022", "name": "SBI Bank B" },
-      { "id": 23, "code": "TESTO023", "name": "SBI Bank C" },
-      { "id": 24, "code": "SCB0216", "name": "Standard Chartered" },
-      { "id": 25, "code": "UOB0226", "name": "UOB Bank" },
-      { "id": 26, "code": "UOB0229", "name": "UOB Bank - Test ID" }
+      {
+        code: "ABB0234",
+        name: "Affin Bank Berhad B2C - Test ID",
+        displayName: "Affin B2C - Test ID",
+        isB2C: true,
+
+      },
+      {
+        code: "ABB0233",
+        name: "Affin Bank Berhad",
+        displayName: "Affin Bank",
+        isB2C: true,
+      },
+      {
+        code: "ABMB0212",
+        name: "Alliance Bank Malaysia Berhad",
+        displayName: "Alliance Bank (Personal)",
+        isB2C: true,
+      },
+      {
+        code: "AGRO01",
+        name: "BANK PERTANIAN MALAYSIA BERHAD (AGROBANK)",
+        displayName: "AGRONet",
+        isB2C: true,
+      },
+      {
+        code: "AMBB0209",
+        name: "AmBank Malaysia Berhad",
+        displayName: "AmBank",
+        isB2C: true,
+      },
+      {
+        code: "BIMB0340",
+        name: "Bank Islam Malaysia Berhad",
+        displayName: "Bank Islam",
+        isB2B: true,
+        isB2C: true,
+      },
+      {
+        code: "BMMB0341",
+        name: "Bank Muamalat Malaysia Berhad",
+        displayName: "Bank Muamalat",
+        isB2C: true,
+      },
+      {
+        code: "BKRM0602",
+        name: "Bank Kerjasama Rakyat Malaysia Berhad",
+        displayName: "Bank Rakyat",
+        isB2B: true,
+        isB2C: true,
+      },
+      {
+        code: "BOCM01",
+        name: "Bank Of China (M) Berhad",
+        displayName: "Bank Of China",
+        isB2C: true,
+      },
+      {
+        code: "BSN0601",
+        name: "Bank Simpanan Nasional",
+        displayName: "BSN",
+        isB2C: true,
+      },
+      {
+        code: "BCBB0235",
+        name: "CIMB Bank Berhad",
+        displayName: "CIMB Clicks",
+        isB2B: true,
+        isB2C: true,
+      },
+      {
+        code: "CIT0219",
+        name: "CITI Bank Berhad",
+        displayName: "Citibank",
+        isB2C: true,
+      },
+      {
+        code: "HLB0224",
+        name: "Hong Leong Bank Berhad",
+        displayName: "Hong Leong Bank",
+        isB2B: true,
+        isB2C: true,
+      },
+      {
+        code: "HSBC0223",
+        name: "HSBC Bank Malaysia Berhad",
+        displayName: "HSBC Bank",
+        isB2B: true,
+        isB2C: true,
+      },
+      {
+        code: "KFH0346",
+        name: "Kuwait Finance House (Malaysia) Berhad",
+        displayName: "KFH",
+        isB2B: true,
+        isB2C: true,
+      },
+      {
+        code: "MBB0228",
+        name: "Malayan Banking Berhad (M2E)",
+        displayName: "Maybank2E",
+        isB2B: true,
+        isB2C: true,
+      },
+      {
+        code: "MB2U0227",
+        name: "Malayan Banking Berhad (M2U)",
+        displayName: "Maybank2U",
+        isB2C: true,
+      },
+      {
+        code: "OCBC0229",
+        name: "OCBC Bank Malaysia Berhad",
+        displayName: "OCBC Bank",
+        isB2B: true,
+        isB2C: true,
+      },
+      {
+        code: "PBB0233",
+        name: "Public Bank Berhad",
+        displayName: "Public Bank",
+        isB2B: true,
+        isB2C: true,
+      },
+      {
+        code: "RHB0218",
+        name: "RHB Bank Berhad",
+        displayName: "RHB Bank",
+        isB2B: true,
+        isB2C: true,
+      },
+      {
+        code: "TESTO021",
+        name: "SBI Bank A",
+        displayName: "SBI Bank A",
+        isB2B: true,
+        isB2C: true,
+        status: $Enums.DefaultStatus.ACTIVE,
+      },
+      {
+        code: "TEST0022",
+        name: "SBI Bank B",
+        displayName: "SBI Bank B",
+        isB2B: true,
+        isB2C: true,
+        status: $Enums.DefaultStatus.ACTIVE,
+      },
+      {
+        code: "TESTO023",
+        name: "SBI Bank C",
+        displayName: "SBI Bank C",
+        isB2B: true,
+        isB2C: true,
+        status: $Enums.DefaultStatus.ACTIVE,
+      },
+      {
+        code: "SCB0216",
+        name: "Standard Chartered Bank",
+        displayName: "Standard Chartered",
+        isB2C: true,
+      },
+      {
+        code: "UOB0226",
+        name: "United Overseas Bank",
+        displayName: "UOB Bank",
+        isB2C: true,
+      },
+      {
+        code: "UOBO229",
+        name: "United Overseas Bank - B2C Test",
+        displayName: "UOB Bank - Test ID",
+        isB2C: true,
+      }
+    ]
+  })
+
+  // create B2B banks
+  const b2bBanks = await prisma.bank.createMany({
+    data: [
+      { code: "ABB0232", name: "Affin Bank Berhad", displayName: "Affin Bank", isB2B: true },
+      { code: "ABB0235", name: "Affin Bank Berhad B2B", displayName: "AFFINMAX", isB2B: true },
+      { code: "ABMB0213", name: "Alliance Bank Malaysia Berhad", displayName: "Alliance Bank (Business)", isB2B: true },
+      { code: "AGRO02", name: "BANK PERTANIAN MALAYSIA BERHAD (AGROBANK)", displayName: "AGRONetBIZ", isB2B: true },
+      { code: "AMBB0208", name: "AmBank Malaysia Berhad", displayName: "AmBank", isB2B: true },
+      { code: "BMMB0342", name: "Bank Muamalat Malaysia Berhad", displayName: "Bank Muamalat", isB2B: true },
+      { code: "BNP003", name: "BNP Paribas Malaysia Berhad", displayName: "BNP Paribas", isB2B: true },
+      { code: "CITO218", name: "CITI Bank Berhad", displayName: "Citibank Corporate Banking", isB2B: true },
+      { code: "DBB0199", name: "Deutsche Bank Berhad", displayName: "Deutsche Bank", isB2B: true },
+      { code: "PBB0234", name: "Public Bank Enterprise", displayName: "Public Bank PB enterprise", isB2B: true },
+      { code: "SCB0215", name: "Standard Chartered Bank", displayName: "Standard Chartered", isB2B: true },
+      { code: "UOB0228", name: "United Overseas Bank B2B Regional", displayName: "UOB Regional", isB2B: true }
     ]
   })
 
@@ -61,6 +227,7 @@ async function main() {
   console.log('👤 Admin user:', adminUser)
   console.log('👤 Regular user:', regularUser)
   console.log('🏦 Banks:', banks)
+  console.log('🏦 B2B Banks:', b2bBanks)
 }
 
 main()

@@ -1,0 +1,13 @@
+
+model Payment {
+    id        Int           @id @default(autoincrement())
+    userEmail String        @map("user_email") @db.VarChar(255)
+    userPhone String        @map("user_phone") @db.VarChar(15)
+    userName  String        @map("user_name") @db.VarChar(255)
+    amount    Decimal       @db.Decimal(16, 2)
+    status    PaymentStatus @default(PENDING)
+    createdAt DateTime      @default(now()) @map("created_at") @db.Timestamp(0)
+    updatedAt DateTime      @updatedAt @map("updated_at") @db.Timestamp(0)
+
+    @@map("payments")
+}

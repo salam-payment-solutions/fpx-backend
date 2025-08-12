@@ -1,0 +1,35 @@
+
+/// User model - represents application users
+model User {
+    // Primary key
+    id Int @id @default(autoincrement()) @map("user_id")
+
+    // Authentication fields
+    email    String  @unique @db.VarChar(255)
+    password String? @db.VarChar(255) // Optional for OAuth users
+
+    // Profile information
+    firstName String? @map("first_name") @db.VarChar(100)
+    lastName  String? @map("last_name") @db.VarChar(100)
+    fullName  String? @map("full_name") @db.VarChar(200) // Computed field or concatenated
+    avatar    String? @db.Text // URL to profile picture
+    bio       String? @db.Text
+
+    // System fields
+    role          Role          @default(USER)
+    status        AccountStatus @default(PENDING)
+    emailVerified Boolean       @default(false) @map("email_verified")
+
+    // Timestamps (following NestJS conventions)
+    createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(0)
+    updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamp(0)
+    deletedAt DateTime? @map("deleted_at") @db.Timestamp(0) // Soft delete support
+
+    // Indexes for better query performance
+    @@index([email])
+    @@index([status])
+    @@index([role])
+    @@index([createdAt])
+    // Table mapping
+    @@map("users")
+}

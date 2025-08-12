@@ -10,6 +10,36 @@ CREATE TYPE "public"."default_statuses" AS ENUM ('active', 'inactive');
 -- CreateEnum
 CREATE TYPE "public"."payment_statuses" AS ENUM ('pending', 'completed', 'failed');
 
+-- CreateEnum
+CREATE TYPE "public"."PaymentMessageToken" AS ENUM ('01', '02', '03');
+
+-- CreateTable
+CREATE TABLE "public"."banks" (
+    "id" SERIAL NOT NULL,
+    "name" VARCHAR(255) NOT NULL,
+    "code" VARCHAR(255) NOT NULL,
+    "display_name" VARCHAR(255),
+    "is_b2c" BOOLEAN NOT NULL DEFAULT false,
+    "is_b2b" BOOLEAN NOT NULL DEFAULT false,
+    "status" "public"."default_statuses" NOT NULL DEFAULT 'inactive',
+
+    CONSTRAINT "banks_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "public"."payments" (
+    "id" SERIAL NOT NULL,
+    "user_email" VARCHAR(255) NOT NULL,
+    "user_phone" VARCHAR(15) NOT NULL,
+    "user_name" VARCHAR(255) NOT NULL,
+    "amount" DECIMAL(16,2) NOT NULL,
+    "status" "public"."payment_statuses" NOT NULL DEFAULT 'pending',
+    "created_at" TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(0) NOT NULL,
+
+    CONSTRAINT "payments_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateTable
 CREATE TABLE "public"."users" (
     "user_id" SERIAL NOT NULL,
@@ -30,29 +60,8 @@ CREATE TABLE "public"."users" (
     CONSTRAINT "users_pkey" PRIMARY KEY ("user_id")
 );
 
--- CreateTable
-CREATE TABLE "public"."payments" (
-    "id" SERIAL NOT NULL,
-    "user_email" VARCHAR(255) NOT NULL,
-    "user_phone" VARCHAR(15) NOT NULL,
-    "user_name" VARCHAR(255) NOT NULL,
-    "amount" DECIMAL(16,2) NOT NULL,
-    "status" "public"."payment_statuses" NOT NULL DEFAULT 'pending',
-    "created_at" TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP(0) NOT NULL,
-
-    CONSTRAINT "payments_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "public"."banks" (
-    "id" SERIAL NOT NULL,
-    "name" VARCHAR(255) NOT NULL,
-    "code" VARCHAR(255) NOT NULL,
-    "status" "public"."default_statuses" NOT NULL DEFAULT 'inactive',
-
-    CONSTRAINT "banks_pkey" PRIMARY KEY ("id")
-);
+-- CreateIndex
+CREATE UNIQUE INDEX "banks_code_key" ON "public"."banks"("code");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "public"."users"("email");

@@ -25,7 +25,7 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:seed": "ts-node prisma/seed.ts",
     "prisma:studio": "prisma studio",
-    "prisma:reset": "prisma migrate reset && npm run prisma:seed"
+    "prisma:reset": "prisma migrate reset"
   },
   "engines": {
     "npm": ">=10.0.0",

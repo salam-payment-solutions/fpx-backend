@@ -1,0 +1,11 @@
+model Bank {
+    id          Int           @id @default(autoincrement())
+    name        String        @map("name") @db.VarChar(255)
+    code        String        @unique @map("code") @db.VarChar(255)
+    displayName String?       @map("display_name") @db.VarChar(255) // Optional display name for the bank
+    isB2C       Boolean       @map("is_b2c") @default(false)
+    isB2B       Boolean       @map("is_b2b") @default(false)
+    status      DefaultStatus @default(INACTIVE) @map("status")
+
+    @@map("banks")
+}

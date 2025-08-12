@@ -1,0 +1,132 @@
+[
+  {
+    "code": "ABB0234",
+    "name": "Affin Bank Berhad B2C - Test ID",
+    "displayName": "Affin B2C - Test ID"
+  },
+  {
+    "code": "ABB0233",
+    "name": "Affin Bank Berhad",
+    "displayName": "Affin Bank"
+  },
+  {
+    "code": "ABMB0212",
+    "name": "Alliance Bank Malaysia Berhad",
+    "displayName": "Alliance Bank (Personal)"
+  },
+  {
+    "code": "AGRO01",
+    "name": "BANK PERTANIAN MALAYSIA BERHAD (AGROBANK)",
+    "displayName": "AGRONet"
+  },
+  {
+    "code": "AMBB0209",
+    "name": "AmBank Malaysia Berhad",
+    "displayName": "AmBank"
+  },
+  {
+    "code": "BIMB0340",
+    "name": "Bank Islam Malaysia Berhad",
+    "displayName": "Bank Islam"
+  },
+  {
+    "code": "BMMB0341",
+    "name": "Bank Muamalat Malaysia Berhad",
+    "displayName": "Bank Muamalat"
+  },
+  {
+    "code": "BKRM0602",
+    "name": "Bank Kerjasama Rakyat Malaysia Berhad",
+    "displayName": "Bank Rakyat"
+  },
+  {
+    "code": "BOCM01",
+    "name": "Bank Of China (M) Berhad",
+    "displayName": "Bank Of China"
+  },
+  {
+    "code": "BSN0601",
+    "name": "Bank Simpanan Nasional",
+    "displayName": "BSN"
+  },
+  {
+    "code": "BCBB0235",
+    "name": "CIMB Bank Berhad",
+    "displayName": "CIMB Clicks"
+  },
+  {
+    "code": "CIT0219",
+    "name": "CITI Bank Berhad",
+    "displayName": "Citibank"
+  },
+  {
+    "code": "HLB0224",
+    "name": "Hong Leong Bank Berhad",
+    "displayName": "Hong Leong Bank"
+  },
+  {
+    "code": "HSBC0223",
+    "name": "HSBC Bank Malaysia Berhad",
+    "displayName": "HSBC Bank"
+  },
+  {
+    "code": "KFH0346",
+    "name": "Kuwait Finance House (Malaysia) Berhad",
+    "displayName": "KFH"
+  },
+  {
+    "code": "MBB0228",
+    "name": "Malayan Banking Berhad (M2E)",
+    "displayName": "Maybank2E"
+  },
+  {
+    "code": "MB2U0227",
+    "name": "Malayan Banking Berhad (M2U)",
+    "displayName": "Maybank2U"
+  },
+  {
+    "code": "OCBC0229",
+    "name": "OCBC Bank Malaysia Berhad",
+    "displayName": "OCBC Bank"
+  },
+  {
+    "code": "PBB0233",
+    "name": "Public Bank Berhad",
+    "displayName": "Public Bank"
+  },
+  {
+    "code": "RHB0218",
+    "name": "RHB Bank Berhad",
+    "displayName": "RHB Bank"
+  },
+  {
+    "code": "TESTO021",
+    "name": "SBI Bank A",
+    "displayName": "SBI Bank A"
+  },
+  {
+    "code": "TEST0022",
+    "name": "SBI Bank B",
+    "displayName": "SBI Bank B"
+  },
+  {
+    "code": "TESTO023",
+    "name": "SBI Bank C",
+    "displayName": "SBI Bank C"
+  },
+  {
+    "code": "SCB0216",
+    "name": "Standard Chartered Bank",
+    "displayName": "Standard Chartered"
+  },
+  {
+    "code": "UOB0226",
+    "name": "United Overseas Bank",
+    "displayName": "UOB Bank"
+  },
+  {
+    "code": "UOBO229",
+    "name": "United Overseas Bank - B2C Test",
+    "displayName": "UOB Bank - Test ID"
+  }
+]
