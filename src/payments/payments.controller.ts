@@ -16,10 +16,14 @@ export class PaymentsController {
 
     @Get('banks')
     async getBankList() {
+        // get all bank that is active sort by bank display name
         const banks = await this.prisma.bank.findMany(
             {
                 where: {
                     status: $Enums.DefaultStatus.ACTIVE
+                },
+                orderBy: {
+                    displayName: 'asc'
                 }
             }
         );
