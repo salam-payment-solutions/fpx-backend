@@ -7,5 +7,8 @@ model Bank {
     isB2B       Boolean       @map("is_b2b") @default(false)
     status      DefaultStatus @default(INACTIVE) @map("status")
 
+    // Relations
+    payments    Payment[]
+
     @@map("banks")
 }

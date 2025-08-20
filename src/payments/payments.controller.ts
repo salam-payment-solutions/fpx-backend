@@ -1,6 +1,11 @@
-import { Controller, Get, Post } from '@nestjs/common';
-import { $Enums } from '@prisma/client';
-import { BankListResponse } from 'src/models/payment/bankListResponse.model';
+import { $Enums, Bank, Payment } from '@prisma/client';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { CreatePaymentDto } from './dto/create-payment.dto';
+import { DefaultResponse } from 'src/shared/default-response.model';
+import { FPXCreatePaymentRequest } from 'src/models/payment/FPXCreatePaymentRequest.model';
+import { FPXGetPaymentRequest } from 'src/models/payment/FPXGetPaymentRequest.model';
+import { PaginatedResponse } from 'src/shared/paginated-response.model';
+import { PaymentMessageType } from 'src/enums/payment/payment-message-type';
 import { PaymentsService } from 'src/payments/payments.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 
@@ -9,13 +14,96 @@ export class PaymentsController {
     constructor(private readonly paymentsService: PaymentsService, private prisma: PrismaService) { }
 
     @Get()
-    findAll() {
-        // Implement your logic here
-        return [];
+    async findAll(
+        @Query('skip') skip?: number,
+        @Query('take') take?: number,
+        @Query('search') search?: string,
+    ): Promise<PaginatedResponse<Payment>> {
+        let payments = await this.prisma.payment.findMany({
+            skip,
+            take,
+        })
+
+        let totalCount = await this.prisma.payment.count();
+
+        let response: PaginatedResponse<Payment> = {
+            statusCode: 200,
+            message: "Successfully retrieved payments",
+            data: payments,
+            totalCount: totalCount,
+            currentPage: skip ? Math.ceil(skip / (take || 10)) + 1 : 1,
+            pageSize: take || 10,
+        }
+
+        return response;
+    }
+
+    @Get('receipt-details')
+    async getPaymentDetails(@Query('exchangeOrderNo') exchangeOrderNo: string, @Query('orderNo') orderNo: string, @Query('transactionId') transactionId: string): Promise<DefaultResponse<Payment | null>> {
+        const payment = await this.paymentsService.getPaymentReceiptDetails(exchangeOrderNo, orderNo);
+
+        if(payment == null) {
+            return {
+                message: "Payment not found",
+                statusCode: 404,
+                data: null
+            }
+        }
+
+        if (payment.isFlagged) {
+            return {
+                message: "Successfully retrieved payment details",
+                statusCode: 200,
+                data: payment
+            }
+        }
+        let request: FPXGetPaymentRequest = {
+            fpx_buyerAccNo: '',
+            fpx_buyerBankBranch: '',
+            fpx_buyerBankId: '',
+            fpx_buyerIban: '',
+            fpx_buyerId: '',
+            fpx_buyerName: '',
+            fpx_checkSum: '',
+            fpx_makerName: '',
+            fpx_msgToken: payment.type,
+            fpx_msgType: PaymentMessageType.AE,
+            fpx_productDesc: payment.description,
+            fpx_sellerBankCode: payment.bank?.code || '',
+            fpx_sellerExId: '',
+            fpx_sellerExOrderNo: exchangeOrderNo,
+            fpx_sellerId: '',
+            fpx_sellerOrderNo: orderNo,
+            fpx_sellerTxnTime: payment.fpxTransactionTime,
+            fpx_txnAmount: payment.amount.toFixed(2),
+            fpx_txnCurrency: '',
+            fpx_version: '',
+        }
+
+        var response = await this.paymentsService.getFPXPaymentDetails(request);
+
+        console.log('response', response);
+    }
+
+    @Post('create')
+    async createPayment(@Body() createPaymentDto: CreatePaymentDto): Promise<DefaultResponse<FPXCreatePaymentRequest>> {
+        let orderNo = this.paymentsService.generateOrderNo();
+        let exchangeOrderNo = this.paymentsService.generateExchangeOrderNo();
+        let fpxTransactionTime = this.paymentsService.generateTransactionTime();
+
+        await this.paymentsService.createPayment(createPaymentDto, orderNo, exchangeOrderNo, fpxTransactionTime);
+
+        const paymentRequest = await this.paymentsService.getFPXCreatePaymentRequest(createPaymentDto, orderNo, exchangeOrderNo, fpxTransactionTime);
+
+        return {
+            message: "Successfully create payment request",
+            statusCode: 201,
+            data: paymentRequest
+        }
     }
 
     @Get('banks')
-    async getBankList() {
+    async getBankList(): Promise<DefaultResponse<Bank[]>> {
         // get all bank that is active sort by bank display name
         const banks = await this.prisma.bank.findMany(
             {
@@ -28,11 +116,13 @@ export class PaymentsController {
             }
         );
 
-        return {
+        let response: DefaultResponse<Bank[]> = {
             message: "Successfully retrieved bank list",
             statusCode: 200,
             data: banks
-        }
+        };
+
+        return response;
     }
 
     @Post('bank-status')

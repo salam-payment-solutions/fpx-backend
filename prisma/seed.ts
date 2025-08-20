@@ -223,11 +223,21 @@ async function main() {
     ]
   })
 
+  // seed seller exchange Id
+  const fpxSellerExchange = await prisma.fpxSellerExchange.create({
+    data: {
+      name: "Affin Bank",
+      sellerId: process.env.FPX_SELLER_ID,
+      exchangeId: process.env.FPX_EXCHANGE_ID,
+    },
+  })
+
   console.log('✅ Database seeded successfully!')
   console.log('👤 Admin user:', adminUser)
   console.log('👤 Regular user:', regularUser)
   console.log('🏦 Banks:', banks)
   console.log('🏦 B2B Banks:', b2bBanks)
+  console.log('💳 FPX Seller Exchange:', fpxSellerExchange)
 }
 
 main()

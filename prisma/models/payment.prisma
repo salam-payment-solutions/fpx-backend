@@ -1,13 +1,28 @@
-
 model Payment {
-    id        Int           @id @default(autoincrement())
-    userEmail String        @map("user_email") @db.VarChar(255)
-    userPhone String        @map("user_phone") @db.VarChar(15)
-    userName  String        @map("user_name") @db.VarChar(255)
-    amount    Decimal       @db.Decimal(16, 2)
-    status    PaymentStatus @default(PENDING)
-    createdAt DateTime      @default(now()) @map("created_at") @db.Timestamp(0)
-    updatedAt DateTime      @updatedAt @map("updated_at") @db.Timestamp(0)
+    id              Int                 @id @default(autoincrement())
+    transactionId   String?             @map("transaction_id") @db.VarChar(40)
+    exchangeOrderNo String              @map("exchange_order_no") @db.VarChar(40)
+    orderNo         String              @map("order_no") @db.VarChar(40)
+    referenceNo     String              @map("reference_no") @db.VarChar(30)
+    description     String              @db.VarChar(30)
+    type            PaymentMessageToken
+    payerEmail      String              @map("payer_email") @db.VarChar(255)
+    payerPhone      String              @map("payer_phone") @db.VarChar(15)
+    payerName       String              @map("payer_name") @db.VarChar(255)
+    amount          Decimal             @db.Decimal(16, 2)
+    sellerId        String              @map("seller_id") @db.VarChar(10)
+    exchangeId      String              @map("exchange_id") @db.VarChar(10)
+    fpxTransactionTime  String       @map("fpx_transaction_time") @db.VarChar(30)
+    status          PaymentStatus       @default(PENDING)
+    isFlagged       Boolean             @map("is_flagged") @default(false)
+    createdAt       DateTime            @default(now()) @map("created_at") @db.Timestamp(0)
+    updatedAt       DateTime            @updatedAt @map("updated_at") @db.Timestamp(0)
+
+    // Relations
+    fpxSellerExchangeId Int
+    fpxSellerExchange   FpxSellerExchange @relation(fields: [fpxSellerExchangeId], references: [id], onDelete: SetNull)
+    bankId              Int               @map("bank_id")
+    bank                Bank              @relation(fields: [bankId], references: [id], onDelete: SetNull)
 
     @@map("payments")
 }

@@ -11,7 +11,7 @@ CREATE TYPE "public"."default_statuses" AS ENUM ('active', 'inactive');
 CREATE TYPE "public"."payment_statuses" AS ENUM ('pending', 'completed', 'failed');
 
 -- CreateEnum
-CREATE TYPE "public"."PaymentMessageToken" AS ENUM ('01', '02', '03');
+CREATE TYPE "public"."PaymentMessageToken" AS ENUM ('B2C', 'B2B1', 'B2B2');
 
 -- CreateTable
 CREATE TABLE "public"."banks" (
@@ -27,15 +27,39 @@ CREATE TABLE "public"."banks" (
 );
 
 -- CreateTable
+CREATE TABLE "public"."fpx_seller_exchange" (
+    "id" SERIAL NOT NULL,
+    "name" VARCHAR(255) NOT NULL,
+    "seller_id" VARCHAR(10) NOT NULL,
+    "exchange_id" VARCHAR(10) NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "fpx_seller_exchange_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "public"."payments" (
     "id" SERIAL NOT NULL,
-    "user_email" VARCHAR(255) NOT NULL,
-    "user_phone" VARCHAR(15) NOT NULL,
-    "user_name" VARCHAR(255) NOT NULL,
+    "transaction_id" VARCHAR(40),
+    "exchange_order_no" VARCHAR(40) NOT NULL,
+    "order_no" VARCHAR(40) NOT NULL,
+    "reference_no" VARCHAR(30) NOT NULL,
+    "description" VARCHAR(30) NOT NULL,
+    "type" "public"."PaymentMessageToken" NOT NULL,
+    "payer_email" VARCHAR(255) NOT NULL,
+    "payer_phone" VARCHAR(15) NOT NULL,
+    "payer_name" VARCHAR(255) NOT NULL,
     "amount" DECIMAL(16,2) NOT NULL,
+    "seller_id" VARCHAR(10) NOT NULL,
+    "exchange_id" VARCHAR(10) NOT NULL,
+    "fpx_transaction_time" VARCHAR(30) NOT NULL,
     "status" "public"."payment_statuses" NOT NULL DEFAULT 'pending',
+    "is_flagged" BOOLEAN NOT NULL DEFAULT false,
     "created_at" TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(0) NOT NULL,
+    "fpxSellerExchangeId" INTEGER NOT NULL,
+    "bank_id" INTEGER NOT NULL,
 
     CONSTRAINT "payments_pkey" PRIMARY KEY ("id")
 );
@@ -77,3 +101,9 @@ CREATE INDEX "users_role_idx" ON "public"."users"("role");
 
 -- CreateIndex
 CREATE INDEX "users_created_at_idx" ON "public"."users"("created_at");
+
+-- AddForeignKey
+ALTER TABLE "public"."payments" ADD CONSTRAINT "payments_fpxSellerExchangeId_fkey" FOREIGN KEY ("fpxSellerExchangeId") REFERENCES "public"."fpx_seller_exchange"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."payments" ADD CONSTRAINT "payments_bank_id_fkey" FOREIGN KEY ("bank_id") REFERENCES "public"."banks"("id") ON DELETE SET NULL ON UPDATE CASCADE;

@@ -17,8 +17,7 @@ datasource db {
 
 generator client {
     provider = "prisma-client-js"
-    output   = "../node_modules/.prisma/client"
-    // previewFeatures = ["prismaSchemaFolder"]
+    // output   = "../node_modules/.prisma/client"
 }
 
 // Optional: Generate database documentation
@@ -65,9 +64,9 @@ enum PaymentStatus {
 }
 
 enum PaymentMessageToken {
-    B2C  @map("01")
-    B2B1 @map("02")
-    B2B2 @map("03")
+    B2C
+    B2B1
+    B2B2
 }
 
 // ==============================================================================

@@ -1,0 +1,13 @@
+model FpxSellerExchange {
+    id         Int      @id @default(autoincrement())
+    name       String   @db.VarChar(255)
+    sellerId   String   @map("seller_id") @db.VarChar(10)
+    exchangeId String   @map("exchange_id") @db.VarChar(10)
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+
+    // Relations
+    payments Payment[]
+
+    @@map("fpx_seller_exchange")
+}
