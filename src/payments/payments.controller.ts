@@ -11,140 +11,175 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Controller('payments')
 export class PaymentsController {
-    constructor(private readonly paymentsService: PaymentsService, private prisma: PrismaService) { }
+  constructor(
+    private readonly paymentsService: PaymentsService,
+    private prisma: PrismaService,
+  ) {}
 
-    @Get()
-    async findAll(
-        @Query('skip') skip?: number,
-        @Query('take') take?: number,
-        @Query('search') search?: string,
-    ): Promise<PaginatedResponse<Payment>> {
-        let payments = await this.prisma.payment.findMany({
-            skip,
-            take,
-        })
+  @Get()
+  async findAll(
+    @Query('skip') skip?: number,
+    @Query('take') take?: number,
+    @Query('search') search?: string,
+  ): Promise<PaginatedResponse<Payment>> {
+    const payments = await this.prisma.payment.findMany({
+      skip,
+      take,
+    });
 
-        let totalCount = await this.prisma.payment.count();
+    const totalCount = await this.prisma.payment.count();
 
-        let response: PaginatedResponse<Payment> = {
-            statusCode: 200,
-            message: "Successfully retrieved payments",
-            data: payments,
-            totalCount: totalCount,
-            currentPage: skip ? Math.ceil(skip / (take || 10)) + 1 : 1,
-            pageSize: take || 10,
-        }
+    const response: PaginatedResponse<Payment> = {
+      statusCode: 200,
+      message: 'Successfully retrieved payments',
+      data: payments,
+      totalCount: totalCount,
+      currentPage: skip ? Math.ceil(skip / (take || 10)) + 1 : 1,
+      pageSize: take || 10,
+    };
 
-        return response;
+    return response;
+  }
+
+  @Get('receipt-details')
+  async getPaymentDetails(
+    @Query('exchangeOrderNo') exchangeOrderNo: string,
+    @Query('orderNo') orderNo: string,
+    @Query('transactionId') transactionId: string,
+  ): Promise<DefaultResponse<Payment | null>> {
+    const payment = await this.paymentsService.getPaymentReceiptDetails(
+      exchangeOrderNo,
+      orderNo,
+    );
+
+    if (payment == null) {
+      return {
+        message: 'Payment not found',
+        statusCode: 404,
+        data: null,
+      };
     }
 
-    @Get('receipt-details')
-    async getPaymentDetails(@Query('exchangeOrderNo') exchangeOrderNo: string, @Query('orderNo') orderNo: string, @Query('transactionId') transactionId: string): Promise<DefaultResponse<Payment | null>> {
-        const payment = await this.paymentsService.getPaymentReceiptDetails(exchangeOrderNo, orderNo);
+    return {
+      message: 'Successfully retrieved payment details',
+      statusCode: 200,
+      data: payment,
+    };
 
-        if(payment == null) {
-            return {
-                message: "Payment not found",
-                statusCode: 404,
-                data: null
-            }
-        }
-
-        if (payment.isFlagged) {
-            return {
-                message: "Successfully retrieved payment details",
-                statusCode: 200,
-                data: payment
-            }
-        }
-        let request: FPXGetPaymentRequest = {
-            fpx_buyerAccNo: '',
-            fpx_buyerBankBranch: '',
-            fpx_buyerBankId: '',
-            fpx_buyerIban: '',
-            fpx_buyerId: '',
-            fpx_buyerName: '',
-            fpx_checkSum: '',
-            fpx_makerName: '',
-            fpx_msgToken: payment.type,
-            fpx_msgType: PaymentMessageType.AE,
-            fpx_productDesc: payment.description,
-            fpx_sellerBankCode: payment.bank?.code || '',
-            fpx_sellerExId: '',
-            fpx_sellerExOrderNo: exchangeOrderNo,
-            fpx_sellerId: '',
-            fpx_sellerOrderNo: orderNo,
-            fpx_sellerTxnTime: payment.fpxTransactionTime,
-            fpx_txnAmount: payment.amount.toFixed(2),
-            fpx_txnCurrency: '',
-            fpx_version: '',
-        }
-
-        var response = await this.paymentsService.getFPXPaymentDetails(request);
-
-        console.log('response', response);
+    if (payment.isFlagged) {
+      return {
+        message: 'Successfully retrieved payment details',
+        statusCode: 200,
+        data: payment,
+      };
     }
 
-    @Post('create')
-    async createPayment(@Body() createPaymentDto: CreatePaymentDto): Promise<DefaultResponse<FPXCreatePaymentRequest>> {
-        let orderNo = this.paymentsService.generateOrderNo();
-        let exchangeOrderNo = this.paymentsService.generateExchangeOrderNo();
-        let fpxTransactionTime = this.paymentsService.generateTransactionTime();
+    const request: FPXGetPaymentRequest = {
+      fpx_buyerAccNo: '',
+      fpx_buyerBankBranch: '',
+      fpx_buyerBankId: '',
+      fpx_buyerIban: '',
+      fpx_buyerId: '',
+      fpx_buyerName: '',
+      fpx_checkSum: '',
+      fpx_makerName: '',
+      fpx_msgToken: payment.type,
+      fpx_msgType: PaymentMessageType.AE,
+      fpx_productDesc: payment.description,
+      fpx_sellerBankCode: payment.bank?.code || '',
+      fpx_sellerExId: '',
+      fpx_sellerExOrderNo: exchangeOrderNo,
+      fpx_sellerId: '',
+      fpx_sellerOrderNo: orderNo,
+      fpx_sellerTxnTime: payment.fpxTransactionTime,
+      fpx_txnAmount: payment.amount.toFixed(2),
+      fpx_txnCurrency: '',
+      fpx_version: '',
+    };
 
-        await this.paymentsService.createPayment(createPaymentDto, orderNo, exchangeOrderNo, fpxTransactionTime);
+    const response = await this.paymentsService.getFPXPaymentDetails(request);
 
-        const paymentRequest = await this.paymentsService.getFPXCreatePaymentRequest(createPaymentDto, orderNo, exchangeOrderNo, fpxTransactionTime);
+    console.log('response', response);
+  }
 
-        return {
-            message: "Successfully create payment request",
-            statusCode: 201,
-            data: paymentRequest
-        }
-    }
+  @Post('create')
+  async createPayment(
+    @Body() createPaymentDto: CreatePaymentDto,
+  ): Promise<DefaultResponse<FPXCreatePaymentRequest>> {
+    let orderNo = this.paymentsService.generateOrderNo();
+    let exchangeOrderNo = this.paymentsService.generateExchangeOrderNo();
+    let fpxTransactionTime = this.paymentsService.generateTransactionTime();
 
-    @Get('banks')
-    async getBankList(): Promise<DefaultResponse<Bank[]>> {
-        // get all bank that is active sort by bank display name
-        const banks = await this.prisma.bank.findMany(
-            {
-                where: {
-                    status: $Enums.DefaultStatus.ACTIVE
-                },
-                orderBy: {
-                    displayName: 'asc'
-                }
-            }
-        );
+    await this.paymentsService.createPayment(
+      createPaymentDto,
+      orderNo,
+      exchangeOrderNo,
+      fpxTransactionTime,
+    );
 
-        let response: DefaultResponse<Bank[]> = {
-            message: "Successfully retrieved bank list",
-            statusCode: 200,
-            data: banks
-        };
+    const paymentRequest =
+      await this.paymentsService.getFPXCreatePaymentRequest(
+        createPaymentDto,
+        orderNo,
+        exchangeOrderNo,
+        fpxTransactionTime,
+      );
 
-        return response;
-    }
+    return {
+      message: 'Successfully create payment request',
+      statusCode: 201,
+      data: paymentRequest,
+    };
+  }
 
-    @Post('bank-status')
-    async updateBankStatusBasedOnFPX() {
-        const fpxBankResponse = await this.paymentsService.getBankList();
+  @Get('banks')
+  async getBankList(): Promise<DefaultResponse<Bank[]>> {
+    // get all bank that is active sort by bank display name
+    const banks = await this.prisma.bank.findMany({
+      where: {
+        status: $Enums.DefaultStatus.ACTIVE,
+      },
+      orderBy: {
+        displayName: 'asc',
+      },
+    });
 
-        const FPXbanks = fpxBankResponse.fpx_bankList.map(bank => {
-            return bank.split("~");
+    let response: DefaultResponse<Bank[]> = {
+      message: 'Successfully retrieved bank list',
+      statusCode: 200,
+      data: banks,
+    };
+
+    return response;
+  }
+
+  @Post('bank-status')
+  async updateBankStatusBasedOnFPX() {
+    const fpxBankResponse = await this.paymentsService.getBankList();
+
+    const FPXbanks = fpxBankResponse.fpx_bankList.map((bank) => {
+      return bank.split('~');
+    });
+
+    let DBBanks = await this.prisma.bank.findMany();
+
+    for (let bank of DBBanks) {
+      const matchingFPXBank = FPXbanks.find(
+        (fpxBank) => fpxBank[0] === bank.code,
+      );
+
+      if (matchingFPXBank) {
+        // Update the bank status based on the FPX response
+        await this.prisma.bank.update({
+          where: { id: bank.id },
+          data: {
+            status:
+              matchingFPXBank[1] === 'A'
+                ? $Enums.DefaultStatus.ACTIVE
+                : $Enums.DefaultStatus.INACTIVE,
+          },
         });
-
-        let DBBanks = await this.prisma.bank.findMany();
-
-        for (let bank of DBBanks) {
-            const matchingFPXBank = FPXbanks.find(fpxBank => fpxBank[0] === bank.code);
-
-            if (matchingFPXBank) {
-                // Update the bank status based on the FPX response
-                await this.prisma.bank.update({
-                    where: { id: bank.id },
-                    data: { status: matchingFPXBank[1] === "A" ? $Enums.DefaultStatus.ACTIVE : $Enums.DefaultStatus.INACTIVE },
-                });
-            }
-        }
+      }
     }
+  }
 }
