@@ -1,13 +1,14 @@
-import { $Enums, Bank, Payment } from '@prisma/client';
+import { $Enums, Bank, Payment, PaymentStatus } from '@prisma/client';
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { CreatePaymentDto } from './dto/create-payment.dto';
-import { DefaultResponse } from 'src/shared/default-response.model';
+import { DefaultResponse } from 'src/models/shared/default-response.model';
 import { FPXCreatePaymentRequest } from 'src/models/payment/FPXCreatePaymentRequest.model';
 import { FPXGetPaymentRequest } from 'src/models/payment/FPXGetPaymentRequest.model';
-import { PaginatedResponse } from 'src/shared/paginated-response.model';
+import { PaginatedResponse } from 'src/models/shared/paginated-response.model';
 import { PaymentMessageType } from 'src/enums/payment/payment-message-type';
 import { PaymentsService } from 'src/payments/payments.service';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { GetPaymentDTO } from './dto/get-payment.dto';
 
 @Controller('payments')
 export class PaymentsController {
@@ -18,16 +19,33 @@ export class PaymentsController {
 
   @Get()
   async findAll(
+    @Query() query: GetPaymentDTO,
     @Query('skip') skip?: number,
     @Query('take') take?: number,
-    @Query('search') search?: string,
   ): Promise<PaginatedResponse<Payment>> {
+    const where: any = {};
+    if (query.transactionId)
+      where.transactionId = { contains: query.transactionId };
+    if (query.exchangeOrderNo)
+      where.exchangeOrderNo = { contains: query.exchangeOrderNo };
+    if (query.orderNo) where.orderNo = { contains: query.orderNo };
+    if (query.referenceNo)
+      where.referenceNo = { contains: query.referenceNo };
+    if (query.type) where.type = { in: query.type.split(',') };
+    if (query.payerEmail) where.payerEmail = { contains: query.payerEmail };
+    if (query.payerPhone) where.payerPhone = { contains: query.payerPhone };
+    if (query.payerName) where.payerName = { contains: query.payerName };
+    if (query.sellerId) where.sellerId = { contains: query.sellerId };
+    if (query.exchangeId) where.exchangeId = { contains: query.exchangeId };
+    if (query.status) where.status = { in: query.status.split(',') };
+
     const payments = await this.prisma.payment.findMany({
+      where,
       skip,
       take,
     });
 
-    const totalCount = await this.prisma.payment.count();
+    const totalCount = await this.prisma.payment.count({ where });
 
     const response: PaginatedResponse<Payment> = {
       statusCode: 200,
