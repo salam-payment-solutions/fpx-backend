@@ -5,6 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module';
 import { UsersModule } from './users/users.module';
 import { PaymentsModule } from './payments/payments.module';
+import { FpxModule } from './fpx/fpx.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { PaymentsModule } from './payments/payments.module';
     PrismaModule,
     UsersModule,
     PaymentsModule,
+    FpxModule,
   ],
   controllers: [AppController],
   providers: [AppService],
