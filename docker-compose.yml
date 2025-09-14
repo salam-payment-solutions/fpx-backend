@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  # Backend service
+  backend:
+    build: . # Build the Docker image using the Dockerfile in the current directory
+    image: salam-payment-fpx-be:latest
+    ports:
+      - '3000:3000' # Forward the container's port 3333 to the host machine's port 3333 for accessing the backend service
+    # depends_on:
+    #   - database # Ensure that the backend service starts after the database service is up and running
+    env_file:
+      - .env
+
+volumes:
+  database:
+    name: salam-payment-fpx-be
