@@ -9,6 +9,8 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
+  console.log('node environment:', process.env.NODE_ENV);
+
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
     new FastifyAdapter()
@@ -32,9 +34,10 @@ async function bootstrap() {
     }),
   );
 
-  await app.listen(process.env.PORT);
+  const port = process.env.PORT || 3000;
+  const ip = '0.0.0.0';
+  await app.listen(port, ip);
 
-  console.log('node environment:', process.env.NODE_ENV);
-  console.log(`Application is running on: ${await app.getUrl()}`);
+  console.log(`Application is running on: http://${ip}:${port}`);
 }
 bootstrap();

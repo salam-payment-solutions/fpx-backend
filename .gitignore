@@ -404,3 +404,5 @@ dist
 
 .env
 .env.*
+
+env.txt

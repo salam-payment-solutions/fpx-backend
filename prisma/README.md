@@ -171,3 +171,12 @@ Opens at: `http://localhost:5555`
 - **Soft Deletes**: `deletedAt` field for data retention
 
 This organization provides a solid foundation for scaling your NestJS application with Prisma!
+
+## Take note for staging adn production server:
+- allow remote connections for now (later when deploy to production, need to secure connections)
+- steps: 
+  1. `nano /etc/postgresql/*/main/postgresql.conf`
+  2. change to `listen_addresses = 'localhost'`
+  3. `nano /etc/postgresql/*/main/pg_hba.conf`
+  4. remove `host    all             all             0.0.0.0/0               md5`
+  5. `sudo systemctl restart postgresql`
