@@ -9,7 +9,8 @@
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "NODE_ENV=development nest start --watch",
-    "start:staging": "cross-env NODE_ENV=staging nest start --watch",
+    "start:staging--watch": "cross-env NODE_ENV=staging nest start --watch",
+    "start:staging": "cross-env NODE_ENV=staging nest start",
     "start:debug": "NODE_ENV=development nest start --debug --watch",
     "start:prod": "NODE_ENV=production node dist/src/main",
     "start:migrate:prod": "prisma migrate deploy && npm run start:prod",
@@ -29,7 +30,8 @@
     "seed:staging": "cross-env NODE_ENV=staging dotenv -e .env.staging -- ts-node prisma/seed.ts",
     "seed:production": "ts-node prisma/seed.ts",
     "prisma:studio": "prisma studio",
-    "prisma:reset": "prisma migrate reset"
+    "prisma:reset": "prisma migrate reset",
+    ""
   },
   "engines": {
     "npm": ">=10.0.0",
