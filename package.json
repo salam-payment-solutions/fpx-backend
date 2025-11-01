@@ -27,10 +27,12 @@
     "migrate:dev": "cross-env NODE_ENV=development dotenv -e .env.development -- npx prisma migrate dev --name init",
     "migrate:staging": "cross-env NODE_ENV=staging dotenv -e .env.staging -- npx prisma migrate deploy",
     "migrate:prod": "cross-env NODE_ENV=production dotenv -e .env.production -- npx prisma migrate deploy",
+    "seed:development": "cross-env NODE_ENV=development dotenv -e .env.development -- ts-node prisma/seed.ts",
     "seed:staging": "cross-env NODE_ENV=staging dotenv -e .env.staging -- ts-node prisma/seed.ts",
     "seed:production": "ts-node prisma/seed.ts",
     "prisma:studio": "prisma studio",
-    "prisma:reset": "prisma migrate reset"
+    "prisma:reset-dev": "cross-env NODE_ENV=development dotenv -e .env.development -- npx prisma migrate reset",
+    "prisma:reset-staging": "cross-env NODE_ENV=staging dotenv -e .env.staging -- npx prisma migrate reset"
   },
   "engines": {
     "npm": ">=10.0.0",

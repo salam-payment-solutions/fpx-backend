@@ -161,7 +161,7 @@ async function main() {
         isB2C: true,
       },
       {
-        code: "TESTO021",
+        code: "TEST0021",
         name: "SBI Bank A",
         displayName: "SBI Bank A",
         isB2B: true,
@@ -177,7 +177,7 @@ async function main() {
         status: $Enums.DefaultStatus.ACTIVE,
       },
       {
-        code: "TESTO023",
+        code: "TEST0023",
         name: "SBI Bank C",
         displayName: "SBI Bank C",
         isB2B: true,
